@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Halloween Quest: The Missing Pumpkin</title>
+  <style>
+    body {
+      font-family: 'Comic Sans MS', cursive;
+      background: black;
+      color: orange;
+      text-align: center;
+      padding: 20px;
+    }
+    #question-box, #next-location, #memory-game, #final-choice, #win-screen {
+      margin-top: 30px;
+      border: 2px dashed orange;
+      padding: 20px;
+      display: none;
+    }
+    .btn {
+      background: darkorange;
+      color: white;
+      padding: 10px 20px;
+      margin: 10px;
+      border: none;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background: orangered;
+    }
+    .card {
+      width: 100px;
+      height: 100px;
+      background-color: orange;
+      display: inline-block;
+      margin: 10px;
+      font-size: 40px;
+      line-height: 100px;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 10px;
+      color: black;
+    }
+    .matched {
+      background-color: green;
+      color: white;
+    }
+    @keyframes sparkle {
+      0% { text-shadow: 0 0 5px orange; }
+      50% { text-shadow: 0 0 20px yellow; }
+      100% { text-shadow: 0 0 5px orange; }
+    }
+    .magic-text {
+      font-size: 2em;
+      animation: sparkle 2s infinite;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎃 Halloween Quest: The Missing Pumpkin 🎃</h1>
+  <p>Help Witch Misty find the stolen pumpkin! Solve riddles before time runs out!</p>
+  <button id="start-btn" class="btn">Start Game</button>
+
+  <div id="question-box">
+    <h2>🌲 Witch's Forest</h2>
+    <div id="question-content"></div>
+  </div>
+
+  <div id="next-location">
+    <h2>🎃 Pumpkin Patch</h2>
+    <p>🧠 Final Riddle: I have no legs, but I can run. I hide your face but I’m just for fun. What am I?</p>
+    <div>
+      <button class="btn" onclick="checkRiddle('ghost')">👻 Ghost</button>
+      <button class="btn" onclick="checkRiddle('mask')">🎭 Mask</button>
+      <button class="btn" onclick="checkRiddle('broom')">🧹 Broom</button>
+    </div>
+    <p id="riddle-feedback"></p>
+  </div>
+
+  <div id="memory-game">
+    <h2>🧠 Haunted Memory Maze</h2>
+    <p>Match all the Halloween characters!</p>
+    <div id="cards-container"></div>
+  </div>
+
+  <div id="final-choice">
+    <h2>🎯 Enchanted Vault</h2>
+    <p>Choose where the magical pumpkin is hidden:</p>
+    <div>
+      <button class="btn" onclick="chooseItem('hat')">🎩 Witch's Hat</button>
+      <button class="btn" onclick="chooseItem('candle')">🕯️ Candle</button>
+      <button class="btn" onclick="chooseItem('basket')">🧺 Basket</button>
+    </div>
+    <p id="choice-result"></p>
+  </div>
+
+  <div id="win-screen">
+    <h2 class="magic-text">✨ Congratulations! ✨</h2>
+    <p>You completed all the Halloween quests and found the magical pumpkin! 🎃</p>
+    <button class="btn" onclick="startGame()">Play Again</button>
+  </div>
+
+  <script>
+    const forestQuestions = [
+      {
+        text: "👻 Which of these is NOT a Halloween character?",
+        answers: [
+          { label: "🎅 Santa Claus", correct: true },
+          { label: "🧙 Witch", correct: false },
+          { label: "🧛 Vampire", correct: false }
+        ]
+      },
+      {
+        text: "🦇 What flies and sleeps upside down in caves?",
+        answers: [
+          { label: "🦇 Bat", correct: true },
+          { label: "🐸 Frog", correct: false },
+          { label: "🐈 Cat", correct: false }
+        ]
+      },
+      {
+        text: "🎃 What do people carve on Halloween?",
+        answers: [
+          { label: "🎃 Pumpkin", correct: true },
+          { label: "🍎 Apple", correct: false },
+          { label: "🍞 Bread", correct: false }
+        ]
+      },
+      {
+        text: "🍬 What do kids say on Halloween night?",
+        answers: [
+          { label: "Trick or Treat!", correct: true },
+          { label: "Give me candy!", correct: false },
+          { label: "Boo Boo!", correct: false }
+        ]
+      }
+    ];
+
+    let currentQuestion = 0;
+
+    function startGame() {
+      hideAll();
+      currentQuestion = 0;
+      document.getElementById("question-box").style.display = "block";
+      showQuestion();
+    }
+
+    function showQuestion() {
+      const container = document.getElementById("question-content");
+      container.innerHTML = "";
+      const q = forestQuestions[currentQuestion];
+      const questionText = document.createElement("p");
+      questionText.textContent = q.text;
+      container.appendChild(questionText);
+      q.answers.forEach(ans => {
+        const btn = document.createElement("button");
+        btn.className = "btn";
+        btn.textContent = ans.label;
+        btn.onclick = () => {
+          if (ans.correct) {
+            currentQuestion++;
+            if (currentQuestion < forestQuestions.length) {
+              showQuestion();
+            } else {
+              document.getElementById("question-box").style.display = "none";
+              document.getElementById("next-location").style.display = "block";
+            }
+          } else {
+            alert("Try again!");
+          }
+        };
+        container.appendChild(btn);
+      });
+    }
+
+    function checkRiddle(answer) {
+      const feedback = document.getElementById("riddle-feedback");
+      if (answer === 'mask') {
+        feedback.textContent = "Correct! Entering the memory maze...";
+        setTimeout(() => {
+          document.getElementById("next-location").style.display = "none";
+          startMemoryGame();
+        }, 1500);
+      } else {
+        feedback.textContent = "Wrong answer. Try again!";
+      }
+    }
+
+    const memoryIcons = ["🎃", "👻", "🕸️", "🧛", "🧙", "🧟", "🐈", "🦇"];
+    let firstCard = null, secondCard = null, matchedPairs = 0;
+
+    function startMemoryGame() {
+      matchedPairs = 0;
+      document.getElementById("memory-game").style.display = "block";
+      const container = document.getElementById("cards-container");
+      container.innerHTML = "";
+      const cards = [...memoryIcons, ...memoryIcons].sort(() => 0.5 - Math.random());
+      cards.forEach(icon => {
+        const div = document.createElement("div");
+        div.className = "card";
+        div.textContent = "?";
+        div.dataset.icon = icon;
+        div.onclick = () => flipCard(div);
+        container.appendChild(div);
+      });
+    }
+
+    function flipCard(card) {
+      if (card.classList.contains("matched") || card === firstCard || secondCard) return;
+      card.textContent = card.dataset.icon;
+      if (!firstCard) firstCard = card;
+      else {
+        secondCard = card;
+        if (firstCard.dataset.icon === secondCard.dataset.icon) {
+          firstCard.classList.add("matched");
+          secondCard.classList.add("matched");
+          firstCard = secondCard = null;
+          matchedPairs++;
+          if (matchedPairs === memoryIcons.length) {
+            setTimeout(() => {
+              document.getElementById("memory-game").style.display = "none";
+              document.getElementById("final-choice").style.display = "block";
+            }, 1000);
+          }
+        } else {
+          setTimeout(() => {
+            firstCard.textContent = secondCard.textContent = "?";
+            firstCard = secondCard = null;
+          }, 1000);
+        }
+      }
+    }
+
+    function chooseItem(item) {
+      const result = document.getElementById("choice-result");
+      if (item === 'basket') {
+        result.textContent = "🎉 You found it! The magical pumpkin was hidden in the basket!";
+        setTimeout(() => {
+          document.getElementById("final-choice").style.display = "none";
+          document.getElementById("win-screen").style.display = "block";
+        }, 1500);
+      } else {
+        result.textContent = "❌ This item is empty. Try again!";
+      }
+    }
+
+    function hideAll() {
+      const ids = ["question-box", "next-location", "memory-game", "final-choice", "win-screen"];
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = "none";
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const startBtn = document.getElementById("start-btn");
+      if (startBtn) {
+        startBtn.addEventListener("click", startGame);
+      }
+    });
+  </script>
+</body>
+</html>
